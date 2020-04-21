@@ -11,7 +11,7 @@ public class Main {
 
         boolean LoggedIn = false;
         boolean NameExists = false;
-        boolean LogginCheck = false;
+        boolean LoginCheck = false;
         boolean PasswordFound = false;
         int Check = 1;
         String Username;
@@ -19,7 +19,7 @@ public class Main {
         String FileUsername;
         String CheckPassword;
         String txt = ".txt";
-        String Line0 =" ";
+        String Line0 = " ";
 
         if (!theDir.exists()) {
             boolean result = false;
@@ -67,17 +67,17 @@ public class Main {
                     try {
                         FileReader reader = new FileReader(theDir.getAbsolutePath() + File.separator + FileUsername);
                         BufferedReader bufferedReader = new BufferedReader(reader);
-
                         String line;
 
                         while ((line = bufferedReader.readLine()) != null) {
                             Line0 = line;
                             continue;
                         }
-                        reader.close();
-                        if(Line0 == Password) {
+
+                        if (Line0.equals(Password)) {
                             PasswordFound = true;
                         }
+                        reader.close();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -86,62 +86,71 @@ public class Main {
                 if (PasswordFound == true) {
                     System.out.println();
                     System.out.println("! Logged In !");
-                }
-                else{
+                    LoggedIn = true;
+                    LoginCheck = true;
+                } else {
                     System.out.println();
                     System.out.println("Either your Password or Username was wrong");
                     System.out.println("Password: " + Line0);
                 }
             }
-            LoggedIn = true;
-        }
 
-        if (Check == 2) {
-            System.out.println();
-            System.out.println();
-            System.out.println("--- Sign Up ---");
-            System.out.print("Username - ");
-            Username = in.nextLine();
+            if (Check == 2) {
+                System.out.println();
+                System.out.println();
+                System.out.println("--- Sign Up ---");
+                System.out.print("Username - ");
+                Username = in.nextLine();
 
-            FileUsername = Username + txt;
+                FileUsername = Username + txt;
 
-            for (int i = 0; i < listOfFiles.length; i++) {
-                if (listOfFiles[i].getName().equals(FileUsername)) {
-                    NameExists = true;
-                    System.out.println("This name is not able to be used");
+                for (int i = 0; i < listOfFiles.length; i++) {
+                    if (listOfFiles[i].getName().equals(FileUsername)) {
+                        NameExists = true;
+                        System.out.println("This name is not able to be used");
+                    }
+                }
+
+                if (NameExists == false) {
+                    File myObj = new File(theDir.getAbsolutePath() + File.separator + FileUsername);
+                    try {
+                        myObj.createNewFile();
+                        System.out.println();
+                        System.out.println("File created: " + myObj.getName() + " In folder " + theDir.getAbsolutePath());
+                        System.out.println("Now you can login");
+                        System.out.print("Password - ");
+                        Password = in.nextLine();
+                        System.out.print("Repeat Password - ");
+                        CheckPassword = in.nextLine();
+                        if (Password.equals(CheckPassword)) {
+                            try {
+                                FileWriter writer = new FileWriter(theDir.getAbsolutePath() + File.separator + FileUsername, true);
+                                writer.write(Password);
+                                writer.write("\r\n");   // write new line
+                                writer.close();
+                                System.out.println("Password Match");
+                                LoggedIn = true;
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            System.out.println();
+                            System.out.println("Password did not match");
+                        }
+
+                    } catch (IOException e) {
+                        System.out.println("An error occurred.");
+                        e.printStackTrace();
+                    }
                 }
             }
-
-            if (NameExists == false) {
-                File myObj = new File(theDir.getAbsolutePath() + File.separator + FileUsername);
-                try {
-                    myObj.createNewFile();
-                    System.out.println();
-                    System.out.println("File created: " + myObj.getName() + " In folder " + theDir.getAbsolutePath());
-                    System.out.println("Now you can login");
-                    System.out.print("Password - ");
-                    Password = in.nextLine();
-                    System.out.print("Repeat Password - ");
-                    CheckPassword = in.nextLine();
-                    if (Password.equals(CheckPassword)) {
-                        try {
-                            FileWriter writer = new FileWriter(theDir.getAbsolutePath() + File.separator + FileUsername, true);
-                            writer.write(Password);
-                            writer.write("\r\n");   // write new line
-                            writer.close();
-                            System.out.println("Password Match");
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        System.out.println();
-                        System.out.println("Password did not match");
-                    }
-
-                } catch (IOException e) {
-                    System.out.println("An error occurred.");
-                    e.printStackTrace();
-                }
+            while(LoginCheck == true){
+            System.out.println();
+            System.out.println("1. Check Balance");
+            System.out.println("2. Deposit Funds");
+            System.out.println("3. Forward Funds");
+            System.out.print("--> ");
+            Check = in.nextInt();
             }
         }
     }
