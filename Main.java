@@ -1,4 +1,4 @@
-import java.net.PasswordAuthentication;
+import javax.print.attribute.standard.NumberUp;
 import java.util.Scanner;
 import java.io.*;
 
@@ -8,6 +8,7 @@ public class Main {
         File theDir = new File("BankAccounts");
         File folder = new File(theDir.getAbsolutePath());
         File[] listOfFiles = folder.listFiles();
+        User[] Users = new User[250];
 
         boolean LoggedIn = false;
         boolean NameExists = false;
@@ -16,7 +17,7 @@ public class Main {
         int Check = 1;
         String Username;
         String Password;
-        String FileUsername;
+        String FileUsername = "";
         String CheckPassword;
         String txt = ".txt";
         String Line0 = " ";
@@ -35,6 +36,40 @@ public class Main {
             }
         }
 
+        // adding the data to the class
+        for (int i = 0; i < listOfFiles.length; i++) {
+            //this is to find the password
+            try {
+                FileReader reader = new FileReader(theDir.getAbsolutePath() + File.separator + (listOfFiles[i].getName()));
+                BufferedReader bufferedReader = new BufferedReader(reader);
+                String line;
+
+                while ((line = bufferedReader.readLine()) != null) {
+                    Line0 = line;
+                    continue;
+                }
+                reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            //The one bellow is to get hte username and then turn that into user data
+            String Name = listOfFiles[i].getName();
+
+            //not the best but the safest way to remove the txt you can also do "filename = filename.replace(".txt", "");"
+            if (Name.endsWith(".txt")){
+                Name = Name.substring(0, Name.length()-4);
+            }
+
+            Users[i] = new User(Name, Line0);
+
+            if (listOfFiles[i].getName().equals(FileUsername)) {
+                NameExists = true;
+            }
+        }
+        //this is to fix a small bug quote this to see the bug and then print out all the names by using a fori and then Users[i].information
+        Users[0] = null;
+
         while (LoggedIn == false) {
             System.out.println();
             System.out.println();
@@ -42,6 +77,10 @@ public class Main {
             System.out.println("1. Login");
             System.out.println("2. Register");
             System.out.print("--> ");
+            while (!in.hasNextInt()) {
+                System.out.print("> ");
+                in = new Scanner(System.in);
+            }
             Check = in.nextInt();
             in.nextLine();
 
@@ -144,13 +183,65 @@ public class Main {
                     }
                 }
             }
-            while(LoginCheck == true){
-            System.out.println();
-            System.out.println("1. Check Balance");
-            System.out.println("2. Deposit Funds");
-            System.out.println("3. Forward Funds");
-            System.out.print("--> ");
-            Check = in.nextInt();
+            while(LoginCheck == true) {
+                System.out.println();
+                System.out.println("1. Check Balance");
+                System.out.println("2. Deposit Funds");
+                System.out.println("3. Forward Funds");
+                System.out.print("--> ");
+                while (!in.hasNextInt()) {
+                    System.out.print("> ");
+                    in = new Scanner(System.in);
+                }
+                Check = in.nextInt();
+
+                if (Check == 1) {
+                    System.out.println();
+                    System.out.println("Balance: ");
+                }
+
+                if (Check == 2) {
+                    System.out.println();
+                    System.out.println("How many funds would you like to deposit?");
+                    System.out.println("Amount: ");
+                }
+                if (Check == 3) {
+                    System.out.println();
+                    System.out.println("To whom would you like to forward funds?");
+                    for (int i = 0; i < Users.length; i++) {
+                        if(Users[i] != null){
+                            System.out.print((i + 1) + ". ");
+                            Users[i].informationName();
+                            System.out.println();
+                        }
+                    }
+                    System.out.print("# - ");
+                    while (!in.hasNextInt()) {
+                        System.out.print("> ");
+                        in = new Scanner(System.in);
+                    }
+                    int NumberName = in.nextInt();
+                    NumberName = NumberName -1;
+
+                    System.out.print("How much money would you like to send to ");
+                    Users[NumberName].informationName();
+                    System.out.println("'s account?");
+                    System.out.print("Amount: ");
+                    while (!in.hasNextInt()) {
+                        System.out.print("> ");
+                        in = new Scanner(System.in);
+                    }
+
+                    int Amount = in.nextInt();
+                    System.out.print("\n" + Amount + " *Jack Bucks* have been added to ");
+                    Users[NumberName].informationName();
+                    System.out.println("'s account!");
+                }
+                else {
+                    System.out.println();
+                    System.out.println("Thank You");
+                    LoginCheck = false;
+                }
             }
         }
     }
