@@ -20,11 +20,11 @@ public class Main {
         String FileUsername = "";
         String CheckPassword;
         String txt = ".txt";
-        String Line0 = " ";
+        String Line0 = "";
+        String BalanceLines = "";
 
         if (!theDir.exists()) {
             boolean result = false;
-
             try {
                 theDir.mkdir();
                 result = true;
@@ -52,19 +52,51 @@ public class Main {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
             //The one bellow is to get hte username and then turn that into user data
             String Name = listOfFiles[i].getName();
-
             //not the best but the safest way to remove the txt you can also do "filename = filename.replace(".txt", "");"
+            //https://stackoverflow.com/questions/16362639/remove-txt-from-file-name-java       VERY HELPFUL
             if (Name.endsWith(".txt")){
                 Name = Name.substring(0, Name.length()-4);
             }
 
-            Users[i] = new User(Name, Line0);
-
+            Users[i] = new User(Name, Line0, 0);
             if (listOfFiles[i].getName().equals(FileUsername)) {
                 NameExists = true;
+            }
+
+            //this next part is for the money that each account has I will be changing the value with the getters and setters
+            try {
+                FileReader reader = new FileReader(theDir.getAbsolutePath() + File.separator + (listOfFiles[i].getName()));
+                BufferedReader bufferedReader = new BufferedReader(reader);
+                String line;
+                int Balance = 0;
+                int counter = 0;
+                while ((line = bufferedReader.readLine()) != null) {
+                    if (counter != 0){
+                        BalanceLines = line;
+                        Balance = Balance + Integer.parseInt(BalanceLines);
+                    }
+                    counter++;
+                }
+                for (int j = 0; j < Users.length; j++) {
+                    if (Users[j] != null) {
+                        //the problem is here!!!! the name is not corresponding mhm fjjkdhgpd
+                        if (Users[j].getUsername().equals(Name)){
+                            Users[j].setBalance(Balance);
+                        }
+                    }
+                }
+                reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        for (int i = 0; i < Users.length; i++) {
+            if(i != 0) {
+                if (Users[i] != null) {
+                    Users[i].informationBalance();
+                }
             }
         }
         //this is to fix a small bug quote this to see the bug and then print out all the names by using a fori and then Users[i].information
@@ -78,7 +110,7 @@ public class Main {
             System.out.println("2. Register");
             System.out.print("--> ");
             while (!in.hasNextInt()) {
-                System.out.print("> ");
+                System.out.print("-> ");
                 in = new Scanner(System.in);
             }
             Check = in.nextInt();
@@ -110,7 +142,7 @@ public class Main {
 
                         while ((line = bufferedReader.readLine()) != null) {
                             Line0 = line;
-                            continue;
+                            break;
                         }
 
                         if (Line0.equals(Password)) {
@@ -130,7 +162,7 @@ public class Main {
                 } else {
                     System.out.println();
                     System.out.println("Either your Password or Username was wrong");
-                    System.out.println("Password: " + Line0);
+//                    System.out.println("Password: " + Line0);
                 }
             }
 
@@ -146,7 +178,7 @@ public class Main {
                 for (int i = 0; i < listOfFiles.length; i++) {
                     if (listOfFiles[i].getName().equals(FileUsername)) {
                         NameExists = true;
-                        System.out.println("This name is not able to be used");
+                        System.out.println("\nThis name is not able to be used");
                     }
                 }
 
@@ -155,7 +187,6 @@ public class Main {
                     try {
                         myObj.createNewFile();
                         System.out.println();
-                        System.out.println("File created: " + myObj.getName() + " In folder " + theDir.getAbsolutePath());
                         System.out.println("Now you can login");
                         System.out.print("Password - ");
                         Password = in.nextLine();
@@ -163,6 +194,7 @@ public class Main {
                         CheckPassword = in.nextLine();
                         if (Password.equals(CheckPassword)) {
                             try {
+                                //System.out.println("File created: " + myObj.getName() + " In folder " + theDir.getAbsolutePath());
                                 FileWriter writer = new FileWriter(theDir.getAbsolutePath() + File.separator + FileUsername, true);
                                 writer.write(Password);
                                 writer.write("\r\n");   // write new line
@@ -190,7 +222,7 @@ public class Main {
                 System.out.println("3. Forward Funds");
                 System.out.print("--> ");
                 while (!in.hasNextInt()) {
-                    System.out.print("> ");
+                    System.out.print("-> ");
                     in = new Scanner(System.in);
                 }
                 Check = in.nextInt();
@@ -223,12 +255,12 @@ public class Main {
                     int NumberName = in.nextInt();
                     NumberName = NumberName -1;
 
-                    System.out.print("How much money would you like to send to ");
+                    System.out.print("\nHow much money would you like to send to ");
                     Users[NumberName].informationName();
                     System.out.println("'s account?");
                     System.out.print("Amount: ");
                     while (!in.hasNextInt()) {
-                        System.out.print("> ");
+                        System.out.print("-> ");
                         in = new Scanner(System.in);
                     }
 
@@ -236,6 +268,17 @@ public class Main {
                     System.out.print("\n" + Amount + " *Jack Bucks* have been added to ");
                     Users[NumberName].informationName();
                     System.out.println("'s account!");
+                    String AmountFile = Integer.toString(Amount);
+
+                    try {
+                        FileUsername = Users[NumberName].informationNameFiles() + txt;
+                        FileWriter writer = new FileWriter(theDir.getAbsolutePath() + File.separator + FileUsername, true);
+                        writer.write(AmountFile);
+                        writer.write("\r\n");   // write new line
+                        writer.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
                 else {
                     System.out.println();
