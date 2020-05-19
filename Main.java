@@ -9,6 +9,9 @@ public class Main {
         File folder = new File(theDir.getAbsolutePath());
         File[] listOfFiles = folder.listFiles();
         User[] Users = new User[250];
+        Transaction[] Transactions = new Transaction[250];
+
+        User Person;
 
         boolean LoggedIn = false;
         boolean NameExists = false;
@@ -22,6 +25,7 @@ public class Main {
         String txt = ".txt";
         String Line0 = "";
         String BalanceLines = "";
+        String TextWriterUsername = "";
 
         if (!theDir.exists()) {
             boolean result = false;
@@ -75,7 +79,7 @@ public class Main {
                 while ((line = bufferedReader.readLine()) != null) {
                     if (counter != 0){
                         BalanceLines = line;
-                        Balance = Balance + Integer.parseInt(BalanceLines);
+//                        Balance = Balance + Integer.parseInt(BalanceLines);
                     }
                     counter++;
                 }
@@ -92,14 +96,7 @@ public class Main {
                 e.printStackTrace();
             }
         }
-        for (int i = 0; i < Users.length; i++) {
-            if(i != 0) {
-                if (Users[i] != null) {
-                    Users[i].informationBalance();
-                }
-            }
-        }
-        //this is to fix a small bug quote this to see the bug and then print out all the names by using a fori and then Users[i].information
+
         Users[0] = null;
 
         while (LoggedIn == false) {
@@ -147,6 +144,7 @@ public class Main {
 
                         if (Line0.equals(Password)) {
                             PasswordFound = true;
+                            Person = new User(Username, reader);
                         }
                         reader.close();
                     } catch (IOException e) {
@@ -157,6 +155,7 @@ public class Main {
                 if (PasswordFound == true) {
                     System.out.println();
                     System.out.println("! Logged In !");
+                    TextWriterUsername = Username;
                     LoggedIn = true;
                     LoginCheck = true;
                 } else {
@@ -270,10 +269,20 @@ public class Main {
                     System.out.println("'s account!");
                     String AmountFile = Integer.toString(Amount);
 
+                    // These two try and catch parts make it so that the file writes the name +- and then the amount
                     try {
                         FileUsername = Users[NumberName].informationNameFiles() + txt;
                         FileWriter writer = new FileWriter(theDir.getAbsolutePath() + File.separator + FileUsername, true);
-                        writer.write(AmountFile);
+                        writer.write(TextWriterUsername + "+" +AmountFile);
+                        writer.write("\r\n");   // write new line
+                        writer.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    try {
+                        FileWriter writer = new FileWriter(theDir.getAbsolutePath() + File.separator + (TextWriterUsername + txt), true);
+                        writer.write(Users[NumberName].informationNameFiles() + "-" + AmountFile);
                         writer.write("\r\n");   // write new line
                         writer.close();
                     } catch (IOException e) {
